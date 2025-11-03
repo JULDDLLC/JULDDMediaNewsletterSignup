@@ -12,7 +12,7 @@ const path = require('path');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Use Resend sandbox sender by default (works without domain verification).
+// Use sandbox sender by default (works without domain verification).
 // After verifying your domain in Resend, set FROM_EMAIL in env to your branded sender.
 const FROM_EMAIL = process.env.FROM_EMAIL || 'JULDD Media <onboarding@resend.dev>';
 
@@ -40,7 +40,7 @@ async function processFormSubmission(formData) {
 
     console.log('✅ Signup record created:', signupRecord);
 
-    // Best-effort write to Excel (skipped on Vercel/serverless)
+    // Best-effort Excel write (skipped on Vercel)
     await syncToExcel(signupRecord);
 
     // Send confirmation email via Resend
@@ -55,14 +55,13 @@ async function processFormSubmission(formData) {
 
 /**
  * Workflow 2: Sync to Excel
- * - On Vercel (serverless, read-only FS), this is skipped to prevent errors.
+ * On Vercel (read-only FS), skip to avoid write errors.
  */
 async function syncToExcel(signupRecord) {
   console.log('📊 Syncing to Excel (best-effort):', signupRecord);
 
-  // Skip Excel I/O on Vercel/serverless to avoid write errors
   if (process.env.VERCEL) {
-    console.log('ℹ️ Running on Vercel – skipping Excel read/write.');
+    console.log('ℹ️ Vercel environment — skipping Excel read/write.');
     return { success: true, skipped: true };
   }
 
@@ -71,7 +70,7 @@ async function syncToExcel(signupRecord) {
     try {
       workbook = xlsx.readFile(excelFilePath);
     } catch (e) {
-      // If file doesn't exist locally, create a new workbook/sheet
+      // Create a new workbook/sheet if the file doesn't exist locally
       workbook = xlsx.utils.book_new();
       const ws = xlsx.utils.aoa_to_sheet([
         ['Date', 'Parent Name', 'Email', 'Children Names', 'Email Status', 'Signup Source']
@@ -99,7 +98,6 @@ async function syncToExcel(signupRecord) {
     return { success: true };
   } catch (error) {
     console.error('❌ Error syncing to Excel:', error);
-    // Don't fail the whole request just because Excel failed
     return { success: false, error: error.message };
   }
 }
@@ -127,7 +125,7 @@ async function sendConfirmationEmail(email, parentName) {
       </ul>
       <h3 style="color: #0f3460;">Next Steps</h3>
       <p>Your free trial will begin immediately. Look for our first newsletter in your inbox soon!</p>
-      <p>If you have any questions, feel free to reach out to us at
+      <p>If you have any questions, reach us at
          <a href="mailto:support@julddmedia.com">support@julddmedia.com</a></p>
       <p>Best regards,<br><strong>The JULDD Media Team</strong></p>
       <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
@@ -139,7 +137,7 @@ async function sendConfirmationEmail(email, parentName) {
   `;
 
   const { data, error } = await resend.emails.send({
-    from: FROM_EMAIL,     // e.g., 'JULDD Media <onboarding@resend.dev>'
+    from: FROM_EMAIL,  // e.g. 'JULDD Media <onboarding@resend.dev>'
     to: email,
     subject: '🎉 Welcome to JULDD Media Kids\' AI Newsletter!',
     html
@@ -171,9 +169,7 @@ async function generateDailyReport(reportType) {
     const reportHTML = generateReportHTML(signups, reportType);
     await sendReportEmail(reportHTML, `${reportType} - New Newsletter Signups`);
 
-    // Placeholder for clearing reported signups
-    clearReportedSignups(signups);
-
+    clearReportedSignups(signups); // placeholder
     return { success: true, signups, report: reportHTML };
   } catch (error) {
     console.error(`❌ Error generating ${reportType}:`, error);
@@ -182,9 +178,8 @@ async function generateDailyReport(reportType) {
 }
 
 function getNewSignups() {
-  // On Vercel, skip reading Excel to avoid FS errors (return empty so reports don't send)
   if (process.env.VERCEL) {
-    console.log('ℹ️ Vercel environment detected — skipping Excel read (no new signups reported).');
+    console.log('ℹ️ Vercel environment — skipping Excel read (no new signups reported).');
     return [];
   }
 
@@ -208,9 +203,7 @@ function clearReportedSignups(_reportedSignups) {
  * Generate HTML report
  */
 function generateReportHTML(signups, reportType) {
-  const signupRows = signups
-    .map(
-      (signup, index) => `
+  const signupRows = signups.map((signup, index) => `
       <tr style="border-bottom: 1px solid #ddd;">
         <td style="padding: 10px;">${index + 1}</td>
         <td style="padding: 10px;">${signup.Date || ''}</td>
@@ -223,9 +216,7 @@ function generateReportHTML(signups, reportType) {
           </span>
         </td>
       </tr>
-    `
-    )
-    .join('');
+    `).join('');
 
   return `
     <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;">
