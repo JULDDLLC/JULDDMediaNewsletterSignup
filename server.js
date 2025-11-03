@@ -13,6 +13,12 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
+// Serve index.html when someone visits the root URL
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+
 // Store signups in memory (will be synced to Google Sheets)
 let signups = [];
 
