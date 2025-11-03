@@ -47,8 +47,16 @@ app.post('/api/signup', async (req, res) => {
         signups.push(signup);
 
         // Log to file for debugging
-        const logEntry = `${new Date().toISOString()} - New signup: ${parentName} (${parentEmail})\n`;
-        fs.appendFileSync(path.join(__dirname, 'signups.log'), logEntry);
+       // Safe logging (disabled on Vercel's read-only filesystem)
+try {
+  if (!process.env.VERCEL) {
+    const logEntry = `${new Date().toISOString()} - New signup: ${parentName} (${parentEmail})\n`;
+    fs.appendFileSync(path.join(__dirname, 'signups.log'), logEntry);
+  }
+} catch (e) {
+  // ignore logging errors on serverless
+}
+
 
         // Process through workflows
         try {
