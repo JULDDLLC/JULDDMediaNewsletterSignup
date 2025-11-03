@@ -1,9 +1,7 @@
 /**
  * JULDD Media Newsletter Signup Workflows
- * Handles form submissions, Excel file integration, and daily reports
- *
- * Email: Resend (no Gmail app password required)
- * Excel: Skips read/write on Vercel (read-only FS) to avoid runtime errors
+ * Backend-only logic: form processing, (optional) Excel sync, emails via Resend
+ * No design or front-end changes.
  */
 
 const { Resend } = require('resend');
@@ -12,8 +10,8 @@ const path = require('path');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Use sandbox sender by default (works without domain verification).
-// After verifying your domain in Resend, set FROM_EMAIL in env to your branded sender.
+// Works immediately without domain verification.
+// Later you can switch to: 'JULDD Media <noreply@julddmedia.com>' after verifying in Resend.
 const FROM_EMAIL = process.env.FROM_EMAIL || 'JULDD Media <onboarding@resend.dev>';
 
 const excelFilePath = path.join(__dirname, '..', 'JULDD_Media_Signups.xlsx');
@@ -25,26 +23,44 @@ async function processFormSubmission(formData) {
   console.log('📝 Processing form submission:', formData);
 
   try {
-    if (!formData.parentName || !formData.parentEmail || !formData.childrenNames) {
+    const parentName  = (formData.parentName  || '').toString().trim();
+    const parentEmail = (formData.parentEmail || '').toString().trim();
+
+    // Accept multiple possible field names for child/children inputs
+    let childrenNames = (
+      formData.childrenNames ??
+      formData.childName ??
+      formData.children ??
+      ''
+    );
+
+    // If array was sent, join; else coerce to string
+    if (Array.isArray(childrenNames)) {
+      childrenNames = childrenNames.map(s => (s || '').toString().trim()).filter(Boolean).join(', ');
+    } else {
+      childrenNames = (childrenNames || '').toString().trim();
+    }
+
+    if (!parentName || !parentEmail) {
       throw new Error('Missing required fields');
     }
 
     const signupRecord = {
       Date: new Date().toISOString().split('T')[0],
-      'Parent Name': formData.parentName,
-      Email: formData.parentEmail,
-      'Children Names': formData.childrenNames,
+      'Parent Name': parentName,
+      Email: parentEmail,
+      'Children Names': childrenNames || 'N/A',
       'Email Status': 'active',
       'Signup Source': 'web_form'
     };
 
     console.log('✅ Signup record created:', signupRecord);
 
-    // Best-effort Excel write (skipped on Vercel)
+    // Best-effort Excel (skipped on Vercel read-only FS)
     await syncToExcel(signupRecord);
 
-    // Send confirmation email via Resend
-    await sendConfirmationEmail(formData.parentEmail, formData.parentName);
+    // Send confirmation email
+    await sendConfirmationEmail(parentEmail, parentName);
 
     return { success: true, message: 'Signup processed successfully', record: signupRecord };
   } catch (error) {
@@ -54,8 +70,7 @@ async function processFormSubmission(formData) {
 }
 
 /**
- * Workflow 2: Sync to Excel
- * On Vercel (read-only FS), skip to avoid write errors.
+ * Workflow 2: Sync to Excel (skips on Vercel/serverless to avoid FS errors)
  */
 async function syncToExcel(signupRecord) {
   console.log('📊 Syncing to Excel (best-effort):', signupRecord);
@@ -70,7 +85,7 @@ async function syncToExcel(signupRecord) {
     try {
       workbook = xlsx.readFile(excelFilePath);
     } catch (e) {
-      // Create a new workbook/sheet if the file doesn't exist locally
+      // Create workbook/sheet if not present
       workbook = xlsx.utils.book_new();
       const ws = xlsx.utils.aoa_to_sheet([
         ['Date', 'Parent Name', 'Email', 'Children Names', 'Email Status', 'Signup Source']
@@ -125,8 +140,7 @@ async function sendConfirmationEmail(email, parentName) {
       </ul>
       <h3 style="color: #0f3460;">Next Steps</h3>
       <p>Your free trial will begin immediately. Look for our first newsletter in your inbox soon!</p>
-      <p>If you have any questions, reach us at
-         <a href="mailto:support@julddmedia.com">support@julddmedia.com</a></p>
+      <p>If you have any questions, reach us at <a href="mailto:support@julddmedia.com">support@julddmedia.com</a></p>
       <p>Best regards,<br><strong>The JULDD Media Team</strong></p>
       <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
       <p style="font-size: 12px; color: #666;">
@@ -137,7 +151,7 @@ async function sendConfirmationEmail(email, parentName) {
   `;
 
   const { data, error } = await resend.emails.send({
-    from: FROM_EMAIL,  // e.g. 'JULDD Media <onboarding@resend.dev>'
+    from: FROM_EMAIL,
     to: email,
     subject: '🎉 Welcome to JULDD Media Kids\' AI Newsletter!',
     html
@@ -153,23 +167,19 @@ async function sendConfirmationEmail(email, parentName) {
 }
 
 /**
- * Workflow 4 & 5: Generate Daily Reports
+ * Workflow 4/5: Daily report helpers (unchanged behavior; sends via Resend)
  */
 async function generateDailyReport(reportType) {
   console.log(`📊 Generating ${reportType}...`);
-
   try {
     const signups = getNewSignups();
-
     if (!signups || signups.length === 0) {
       console.log('ℹ️ No new signups to report.');
       return { success: true, signups: [], message: 'No new signups' };
     }
-
     const reportHTML = generateReportHTML(signups, reportType);
     await sendReportEmail(reportHTML, `${reportType} - New Newsletter Signups`);
-
-    clearReportedSignups(signups); // placeholder
+    clearReportedSignups(signups);
     return { success: true, signups, report: reportHTML };
   } catch (error) {
     console.error(`❌ Error generating ${reportType}:`, error);
@@ -182,7 +192,6 @@ function getNewSignups() {
     console.log('ℹ️ Vercel environment — skipping Excel read (no new signups reported).');
     return [];
   }
-
   try {
     const workbook = xlsx.readFile(excelFilePath);
     const sheetName = workbook.SheetNames[0];
@@ -199,24 +208,20 @@ function clearReportedSignups(_reportedSignups) {
   console.log('✅ Clearing reported signups from the queue (placeholder).');
 }
 
-/**
- * Generate HTML report
- */
 function generateReportHTML(signups, reportType) {
-  const signupRows = signups.map((signup, index) => `
-      <tr style="border-bottom: 1px solid #ddd;">
-        <td style="padding: 10px;">${index + 1}</td>
-        <td style="padding: 10px;">${signup.Date || ''}</td>
-        <td style="padding: 10px;">${signup['Parent Name'] || ''}</td>
-        <td style="padding: 10px;">${signup.Email || ''}</td>
-        <td style="padding: 10px;">${signup['Children Names'] || ''}</td>
-        <td style="padding: 10px;">
-          <span style="background: #4caf50; color: white; padding: 5px 10px; border-radius: 3px;">
-            ${signup['Email Status'] || 'active'}
-          </span>
-        </td>
-      </tr>
-    `).join('');
+  const rows = signups.map((s, i) => `
+    <tr style="border-bottom: 1px solid #ddd;">
+      <td style="padding: 10px;">${i + 1}</td>
+      <td style="padding: 10px;">${s.Date || ''}</td>
+      <td style="padding: 10px;">${s['Parent Name'] || ''}</td>
+      <td style="padding: 10px;">${s.Email || ''}</td>
+      <td style="padding: 10px;">${s['Children Names'] || ''}</td>
+      <td style="padding: 10px;">
+        <span style="background: #4caf50; color: #fff; padding: 5px 10px; border-radius: 3px;">
+          ${s['Email Status'] || 'active'}
+        </span>
+      </td>
+    </tr>`).join('');
 
   return `
     <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;">
@@ -234,52 +239,37 @@ function generateReportHTML(signups, reportType) {
             <th style="padding: 10px; text-align: left;">Status</th>
           </tr>
         </thead>
-        <tbody>
-          ${signupRows}
-        </tbody>
+        <tbody>${rows}</tbody>
       </table>
       <p style="color: #666; font-size: 12px;">Report generated on ${new Date().toLocaleString()}</p>
-    </div>
-  `;
+    </div>`;
 }
 
-/**
- * Send report email (Resend)
- */
 async function sendReportEmail(reportHTML, subject) {
   console.log('📧 Sending report email via Resend...');
-
   const { data, error } = await resend.emails.send({
     from: FROM_EMAIL,
     to: 'julie@juldd.com',
     subject,
     html: reportHTML
   });
-
   if (error) {
     console.error('❌ Resend error (report):', error);
     throw error;
   }
-
   console.log('✅ Report email sent:', data?.id || data);
   return { success: true };
 }
 
-/**
- * Send test report (Resend)
- */
 async function sendTestReport() {
   console.log('🧪 Sending test report (Resend)...');
-
   try {
     const testSignups = [
       { Date: '2025-11-02', 'Parent Name': 'Test Parent 1', Email: 'test1@example.com', 'Children Names': 'Test Child 1', 'Email Status': 'active' },
       { Date: '2025-11-02', 'Parent Name': 'Test Parent 2', Email: 'test2@example.com', 'Children Names': 'Test Child 2, Test Child 3', 'Email Status': 'active' }
     ];
-
     const report = generateReportHTML(testSignups, 'Test Report');
     await sendReportEmail(report, '🧪 TEST REPORT - JULDD Media Newsletter Signups');
-
     console.log('✅ Test report sent successfully!');
     return { success: true, message: 'Test report sent to julie@juldd.com' };
   } catch (error) {
