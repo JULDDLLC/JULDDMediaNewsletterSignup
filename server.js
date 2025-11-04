@@ -1,55 +1,47 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const path = require('path');
+/**
+ * JULDD Media Newsletter Signup Server
+ * Clean restore version (Resend API only, no confetti)
+ */
 
-const {
-  processFormSubmission,
-  generateDailyReport,
-  sendTestReport
-} = require('./workflows');
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const path = require("path");
+const { processFormSubmission } = require("./utils/workflows");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 
-// Serve static files from repo root (so favicon + images work)
-app.use(express.static(__dirname));
-
-// Root => index.html
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+// Health check
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", message: "Server running fine" });
 });
 
-// Favicon fallbacks
-app.get(['/favicon.ico', '/favicon.png'], (req, res) => {
-  const file = req.path.endsWith('.png') ? 'juldd_media_logo.png' : 'juldd_media_logo.ico';
-  res.sendFile(path.join(__dirname, file));
-});
+// Form submission route
+app.post("/api/signup", async (req, res) => {
+  console.log("📩 /api/signup request received");
 
-// Accept form POSTs (support a few common paths)
-app.post(['/submit', '/signup', '/api/submit', '/api/signup'], async (req, res) => {
   try {
-    const { parentName, parentEmail, childrenNames } = req.body;
-    const result = await processFormSubmission({ parentName, parentEmail, childrenNames });
-    res.json({ ok: true, result });
-  } catch (err) {
-    console.error('Form submit error:', err);
-    res.status(500).json({ ok: false, error: err.message });
+    const result = await processFormSubmission(req.body);
+    console.log("✅ Form submission successful:", result);
+    res.status(200).json({ success: true, message: "Signup successful!" });
+  } catch (error) {
+    console.error("❌ Form submit error:", error);
+    res.status(500).json({ success: false, message: error.message || "Server error" });
   }
 });
 
-// Optional healthcheck
-app.get('/health', (req, res) => res.json({ ok: true }));
+// Serve frontend
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
-const port = process.env.PORT || 3000;
-
-// On Vercel, export the app; locally, start a server
-if (process.env.VERCEL) {
-  module.exports = app;
-} else {
-  app.listen(port, () => console.log(`Server running on http://localhost:${port}`));
-}
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 JULDD Media Newsletter server running on port ${PORT}`);
+});
