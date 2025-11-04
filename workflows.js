@@ -16,9 +16,6 @@ const FROM_EMAIL = process.env.FROM_EMAIL || 'JULDD Media <onboarding@resend.dev
 
 const excelFilePath = path.join(__dirname, '..', 'JULDD_Media_Signups.xlsx');
 
-/**
- * Workflow 1: Process Form Submission
- */
 async function processFormSubmission(formData) {
   console.log('📝 Processing form submission:', formData);
 
@@ -26,7 +23,7 @@ async function processFormSubmission(formData) {
     const parentName  = (formData.parentName  || '').toString().trim();
     const parentEmail = (formData.parentEmail || '').toString().trim();
 
-    // Accept multiple possible field names for child/children inputs
+    // Accept several possible keys and fallbacks for child names
     let childrenNames = (
       formData.childrenNames ??
       formData.childName ??
@@ -34,7 +31,7 @@ async function processFormSubmission(formData) {
       ''
     );
 
-    // If array was sent, join; else coerce to string
+    // If an array was sent, join it; otherwise coerce to string
     if (Array.isArray(childrenNames)) {
       childrenNames = childrenNames.map(s => (s || '').toString().trim()).filter(Boolean).join(', ');
     } else {
@@ -53,6 +50,7 @@ async function processFormSubmission(formData) {
       'Email Status': 'active',
       'Signup Source': 'web_form'
     };
+
 
     console.log('✅ Signup record created:', signupRecord);
 
