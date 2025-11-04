@@ -1,47 +1,54 @@
-/**
- * JULDD Media Newsletter Signup Server
- * Clean restore version (Resend API only, no confetti)
- */
-
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const path = require("path");
-const { processFormSubmission } = require("./utils/workflows");
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const { Resend } = require('resend');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
-// Middleware
+const resend = new Resend('YOUR_RESEND_API_KEY'); // Replace with your actual API key
+
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static('public'));
 
-// Health check
-app.get("/api/health", (req, res) => {
-  res.json({ status: "ok", message: "Server running fine" });
-});
-
-// Form submission route
-app.post("/api/signup", async (req, res) => {
-  console.log("📩 /api/signup request received");
+app.post('/api/signup', async (req, res) => {
+  const { name, email } = req.body;
 
   try {
-    const result = await processFormSubmission(req.body);
-    console.log("✅ Form submission successful:", result);
-    res.status(200).json({ success: true, message: "Signup successful!" });
+    const data = await resend.emails.send({
+      from: 'JULDD Media <onboarding@resend.dev>',
+      to: email,
+      subject: 'Welcome to JULDD Media! 🎉',
+      html: `
+        <h2>Welcome to JULDD Media! 🎉</h2>
+        <p>Hi ${name},</p>
+        <p>Thank you for signing up for the JULDD Media Kids' AI Newsletter! We're excited to have you and your family join our community.</p>
+        <h3>Your Free Trial</h3>
+        <p>✅ <strong>1 Month Free Access</strong> – No credit card required!</p>
+        <p>You'll receive our latest content featuring audio and animation designed specifically for kids.</p>
+        <h3>What to Expect</h3>
+        <ul>
+          <li>📚 Educational content with AI-powered learning</li>
+          <li>🎨 Engaging animations and audio stories</li>
+          <li>👨‍👩‍👧‍👦 Age-appropriate material for your children</li>
+          <li>📧 Regular newsletter updates (frequency TBD)</li>
+        </ul>
+        <h3>Next Steps</h3>
+        <p>Your free trial will begin immediately. Look for our first newsletter in your inbox soon!</p>
+        <p>If you have any questions, reach us at <a href="mailto:support@julddmedia.com">support@julddmedia.com</a></p>
+        <p>Best regards,<br/>The JULDD Media Team</p>
+      `,
+    });
+
+    console.log('Email sent:', data);
+    res.status(200).json({ message: 'Signup successful. Email sent.' });
   } catch (error) {
-    console.error("❌ Form submit error:", error);
-    res.status(500).json({ success: false, message: error.message || "Server error" });
+    console.error('Email error:', error);
+    res.status(500).json({ message: 'Error sending email.' });
   }
 });
 
-// Serve frontend
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 JULDD Media Newsletter server running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
