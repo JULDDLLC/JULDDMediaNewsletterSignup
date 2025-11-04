@@ -1,54 +1,56 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const cors = require('cors');
+const bodyParser = require('body-parser');
+const path = require('path');
 const { Resend } = require('resend');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-const resend = new Resend('YOUR_RESEND_API_KEY'); // Replace with your actual API key
+const resend = new Resend(process.env.RESEND_API_KEY || 'YOUR_RESEND_API_KEY');
 
+// Middleware
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/api/signup', async (req, res) => {
+// Serve static files from the repo root (so index.html, favicon and images are reachable)
+app.use(express.static(__dirname));
+
+// Root route – send the landing page
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Favicon fallbacks
+app.get(['/favicon.ico', '/favicon.png'], (req, res) => {
+  const file = req.path.endsWith('.png') ? 'juldd_media_logo.png' : 'juldd_media_logo.ico';
+  res.sendFile(path.join(__dirname, file));
+});
+
+// Newsletter signup handler – adjust fields as needed
+app.post(['/submit','/signup','/api/submit','/api/signup'], async (req, res) => {
   const { name, email } = req.body;
-
   try {
-    const data = await resend.emails.send({
+    await resend.emails.send({
       from: 'JULDD Media <onboarding@resend.dev>',
       to: email,
-      subject: 'Welcome to JULDD Media! 🎉',
-      html: `
-        <h2>Welcome to JULDD Media! 🎉</h2>
-        <p>Hi ${name},</p>
-        <p>Thank you for signing up for the JULDD Media Kids' AI Newsletter! We're excited to have you and your family join our community.</p>
-        <h3>Your Free Trial</h3>
-        <p>✅ <strong>1 Month Free Access</strong> – No credit card required!</p>
-        <p>You'll receive our latest content featuring audio and animation designed specifically for kids.</p>
-        <h3>What to Expect</h3>
-        <ul>
-          <li>📚 Educational content with AI-powered learning</li>
-          <li>🎨 Engaging animations and audio stories</li>
-          <li>👨‍👩‍👧‍👦 Age-appropriate material for your children</li>
-          <li>📧 Regular newsletter updates (frequency TBD)</li>
-        </ul>
-        <h3>Next Steps</h3>
-        <p>Your free trial will begin immediately. Look for our first newsletter in your inbox soon!</p>
-        <p>If you have any questions, reach us at <a href="mailto:support@julddmedia.com">support@julddmedia.com</a></p>
-        <p>Best regards,<br/>The JULDD Media Team</p>
-      `,
+      subject: 'Welcome to JULDD Media!',
+      html: `<h2>Welcome to JULDD Media!</h2><p>Hi ${name},</p><p>Thanks for signing up.</p>`
     });
-
-    console.log('Email sent:', data);
     res.status(200).json({ message: 'Signup successful. Email sent.' });
-  } catch (error) {
-    console.error('Email error:', error);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Error sending email.' });
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+// Health check (optional)
+app.get('/health', (req, res) => res.json({ ok: true }));
+
+// Export for Vercel; start a local server when not on Vercel
+if (process.env.VERCEL) {
+  module.exports = app;
+} else {
+  app.listen(port, () => console.log(`Server running at http://localhost:${port}`));
+}
