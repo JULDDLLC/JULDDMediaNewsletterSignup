@@ -516,7 +516,6 @@
 
                 if (response.ok) {
                     successMessage.style.display = 'block';
-                            launchConfetti();
                     document.getElementById('signupForm').reset();
                     
                     // Reset children fields
@@ -568,7 +567,35 @@
     }, 250);
   }
 
- </script>
-</body>
+  // Hook into your existing success logic
+  const form = document.getElementById('signupForm');
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const payload = Object.fromEntries(formData.entries());
 
+    try {
+      const res = await fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        document.getElementById('successMessage').style.display = 'block';
+        document.getElementById('errorMessage').style.display = 'none';
+        launchConfetti(); // 🎉 trigger confetti here
+      } else {
+        throw new Error(data.message || 'Signup failed.');
+      }
+    } catch (err) {
+      document.getElementById('errorMessage').style.display = 'block';
+      document.getElementById('successMessage').style.display = 'none';
+      console.error(err);
+    }
+  });
+</script>
+</body>
 </html>
