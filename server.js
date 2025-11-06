@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
-const { processFormSubmission } = require('./workflow'); // This will now work!
+const workflows = require('./workflows');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -30,18 +30,64 @@ app.get(['/favicon.ico', '/favicon.png'], (req, res) => {
   });
 });
 
-// Main newsletter signup handler
-app.post('/api/signup', async (req, res) => {
-  console.log('Received signup request:', req.body);
-  try {
-    // Pass the entire form body to the processing function
-    const result = await processFormSubmission(req.body);
-    res.status(200).json({ success: true, message: result.message });
-  } catch (error) {
-    console.error('API Error:', error.message);
-    // Send a more descriptive error message to the frontend
-    res.status(500).json({ success: false, message: error.message || 'An internal server error occurred.' });
-  }
+// Endpoint to get signups since a specific time (for daily reports)
+app.get('/api/signups/since/:timestamp', (req, res) => {
+    const timestamp = parseInt(req.params.timestamp);
+    const recentSignups = signups.filter(signup => {
+        const signupTime = new Date(signup.date).getTime();
+        return signupTime >= timestamp;
+    });
+
+    res.json({
+        total: recentSignups.length,
+        signups: recentSignups
+    });
+});
+
+// Endpoint to send test report
+app.post('/api/test-report', async (req, res) => {
+    try {
+        console.log('📧 Sending test report...');
+        const result = await workflows.sendTestReport();
+        res.json({
+            success: true,
+            message: 'Test report sent to julie@juldd.com',
+            result
+        });
+    } catch (error) {
+        console.error('Error sending test report:', error);
+        res.status(500).json({ error: 'Failed to send test report' });
+    }
+});
+
+// Endpoint to trigger morning report
+app.post('/api/reports/morning', async (req, res) => {
+    try {
+        const result = await workflows.generateMorningReport();
+        res.json({
+            success: true,
+            message: 'Morning report generated',
+            result
+        });
+    } catch (error) {
+        console.error('Error generating morning report:', error);
+        res.status(500).json({ error: 'Failed to generate morning report' });
+    }
+});
+
+// Endpoint to trigger evening report
+app.post('/api/reports/evening', async (req, res) => {
+    try {
+        const result = await workflows.generateEveningReport();
+        res.json({
+            success: true,
+            message: 'Evening report generated',
+            result
+        });
+    } catch (error) {
+        console.error('Error generating evening report:', error);
+        res.status(500).json({ error: 'Failed to generate evening report' });
+    }
 });
 
 // Health check endpoint (optional but good practice)
