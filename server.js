@@ -2,55 +2,58 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
-const { Resend } = require('resend');
+const { processFormSubmission } = require('./workflow'); // Correctly import your workflow
 
 const app = express();
 const port = process.env.PORT || 3000;
-
-const resend = new Resend(process.env.RESEND_API_KEY || 'YOUR_RESEND_API_KEY');
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Serve static files from the repo root (so index.html, favicon and images are reachable)
+// Serve static files from the root directory (for index.html, CSS, images)
 app.use(express.static(__dirname));
 
-// Root route – send the landing page
+// Root route to serve the main signup page
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Favicon fallbacks
+// Favicon fallback routes
 app.get(['/favicon.ico', '/favicon.png'], (req, res) => {
   const file = req.path.endsWith('.png') ? 'juldd_media_logo.png' : 'juldd_media_logo.ico';
-  res.sendFile(path.join(__dirname, file));
+  res.sendFile(path.join(__dirname, file), (err) => {
+    if (err) {
+      res.status(404).send("Not found");
+    }
+  });
 });
 
-// Newsletter signup handler – adjust fields as needed
-app.post(['/submit','/signup','/api/submit','/api/signup'], async (req, res) => {
-  const { name, email } = req.body;
+// Main newsletter signup handler
+// This single endpoint will now use the full workflow
+app.post('/api/signup', async (req, res) => {
+  console.log('Received signup request:', req.body);
   try {
-    await resend.emails.send({
-      from: 'JULDD Media <onboarding@resend.dev>',
-      to: email,
-      subject: 'Welcome to JULDD Media!',
-      html: `<h2>Welcome to JULDD Media!</h2><p>Hi ${name},</p><p>Thanks for signing up.</p>`
-    });
-    res.status(200).json({ message: 'Signup successful. Email sent.' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error sending email.' });
+    // Pass the entire form body to the processing function
+    const result = await processFormSubmission(req.body);
+    res.status(200).json({ success: true, message: result.message });
+  } catch (error) {
+    console.error('API Error:', error.message);
+    // Send a more descriptive error message to the frontend
+    res.status(500).json({ success: false, message: error.message || 'An internal server error occurred.' });
   }
 });
 
-// Health check (optional)
-app.get('/health', (req, res) => res.json({ ok: true }));
+// Health check endpoint (optional but good practice)
+app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
 
-// Export for Vercel; start a local server when not on Vercel
-if (process.env.VERCEL) {
-  module.exports = app;
-} else {
-  app.listen(port, () => console.log(`Server running at http://localhost:${port}`));
+// Start the server if not running on a serverless environment like Vercel
+if (!process.env.VERCEL) {
+  app.listen(port, () => {
+    console.log(`🚀 Server running locally at http://localhost:${port}`);
+  });
 }
+
+// Export the app for serverless deployment
+module.exports = app;
