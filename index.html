@@ -7,11 +7,36 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); min-height: 100vh; padding: 20px; color: #333; }
-        .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); overflow: hidden; }
-        .content-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
-        .image-section { background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); padding: 40px; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 600px; }
-        .image-section img { width: 100%; height: auto; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
-        .form-section { padding: 50px 40px; display: flex; flex-direction: column; justify-content: center; }
+        .container { max-width: 700px; /* Adjusted max-width for a single column layout */ margin: 40px auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); overflow: hidden; }
+        
+        /* --- CHANGE 1: Switched to a single column layout --- */
+        .content-wrapper { 
+            display: grid; 
+            grid-template-columns: 1fr; /* This creates one column, so items stack vertically */
+            gap: 0; 
+        }
+
+        /* --- CHANGE 2: Adjusted image section for top placement --- */
+        .image-section { 
+            /* The gradient is now a fallback if the image doesn't load */
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); 
+            line-height: 0; /* Removes any extra space around the image */
+        }
+        
+        .image-section img { 
+            width: 100%; 
+            height: auto; 
+            display: block; /* Ensures no extra space below the image */
+        }
+
+        /* --- CHANGE 3: Adjusted form section padding for the new layout --- */
+        .form-section { 
+            padding: 40px; /* Uniform padding */
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+        }
+
         .form-header { margin-bottom: 30px; }
         .form-header h1 { color: #0f3460; font-size: 28px; margin-bottom: 10px; font-weight: 700; }
         .form-header p { color: #666; font-size: 14px; line-height: 1.6; }
@@ -43,10 +68,15 @@
         .loading { display: none; text-align: center; color: #0f3460; font-weight: 600; }
         .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #0f3460; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* The media query for mobile is now the default, so we can simplify or remove it */
         @media (max-width: 768px) {
-            .content-wrapper { grid-template-columns: 1fr; }
-            .image-section { min-height: 300px; }
-            .form-section { padding: 30px 20px; }
+            .container {
+                margin: 20px auto; /* A little less margin on mobile */
+            }
+            .form-section {
+                padding: 30px 20px;
+            }
         }
     </style>
 </head>
@@ -54,6 +84,7 @@
     <div class="container">
         <div class="content-wrapper">
             <div class="image-section">
+                <!-- This is the image you wanted to be the primary focus -->
                 <img src="https://ldfacwgnawbpvufohzgm.supabase.co/storage/v1/object/public/image-uploads/loaded_images/join_the_waitlist_20251102_044756_29d9781f.png?" alt="JULDD Media Kids AI Newsletter">
             </div>
             <div class="form-section">
