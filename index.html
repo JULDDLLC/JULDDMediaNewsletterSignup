@@ -5,159 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JULDD Media - Kids' AI Newsletter Signup</title>
     <style>
-        /* --- THEME RESET & FONT --- */
+        /* The new dark mode theme CSS is unchanged */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            /* --- THEME CHANGE: Dark Mode Background --- */
-            background-color: #1A202C; /* A dark navy/charcoal from your theme */
-            min-height: 100vh; 
-            padding: 20px; 
-            color: #E2E8F0; /* Light text for dark background */
-        }
-
-        /* --- THEME CHANGE: Dark Form Container --- */
-        .container { 
-            max-width: 700px; 
-            margin: 40px auto; 
-            background: #2D3748; /* The dark gray card color from your theme */
-            border-radius: 20px; 
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); 
-            overflow: hidden; 
-            border: 1px solid #4A5568; /* Subtle border */
-        }
-        
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1A202C; min-height: 100vh; padding: 20px; color: #E2E8F0; }
+        .container { max-width: 700px; margin: 40px auto; background: #2D3748; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); overflow: hidden; border: 1px solid #4A5568; }
         .content-wrapper { display: grid; grid-template-columns: 1fr; gap: 0; }
         .image-section { line-height: 0; }
         .image-section img { width: 100%; height: auto; display: block; }
-
         .form-section { padding: 40px; display: flex; flex-direction: column; justify-content: center; }
-
-        /* --- THEME CHANGE: Light Text Headers --- */
         .form-header { margin-bottom: 30px; }
-        .form-header h1 { 
-            color: #FFFFFF; /* White main header */
-            font-size: 28px; 
-            margin-bottom: 10px; 
-            font-weight: 700; 
-        }
-        .form-header p { 
-            color: #A0AEC0; /* Lighter gray for subheading */
-            font-size: 14px; 
-            line-height: 1.6; 
-        }
-
+        .form-header h1 { color: #FFFFFF; font-size: 28px; margin-bottom: 10px; font-weight: 700; }
+        .form-header p { color: #A0AEC0; font-size: 14px; line-height: 1.6; }
         .form-group { margin-bottom: 20px; }
-        label { 
-            display: block; 
-            margin-bottom: 8px; 
-            color: #CBD5E0; /* Light gray for labels */
-            font-weight: 600; 
-            font-size: 14px; 
-        }
-
-        /* --- THEME CHANGE: Dark Inputs --- */
-        input[type="text"], input[type="email"] { 
-            width: 100%; 
-            padding: 12px 15px; 
-            background-color: #1A202C; /* Dark background for inputs */
-            border: 2px solid #4A5568; /* Gray border */
-            color: #FFFFFF; /* White text when typing */
-            border-radius: 8px; 
-            font-size: 14px; 
-            font-family: inherit; 
-            transition: all 0.3s ease; 
-        }
-
-        /* --- THEME CHANGE: Electric Green Focus Highlight --- */
-        input[type="text"]:focus, input[type="email"]:focus { 
-            outline: none; 
-            border-color: #38B2AC; /* Your theme's electric green/teal */
-            box-shadow: 0 0 0 3px rgba(56, 178, 172, 0.3); 
-        }
-
-        /* --- THEME CHANGE: Dark Sections --- */
-        .children-section, .terms-section { 
-            background: #1A202C; /* Matching dark background */
-            padding: 20px; 
-            border-radius: 10px; 
-            margin-bottom: 20px; 
-            border: 1px solid #4A5568;
-        }
-        .children-section h3, .terms-section h4 { 
-            color: #FFFFFF; /* White headers for sections */
-        }
-        .terms-content, .terms-content h5 {
-            color: #A0AEC0; /* Light gray for terms text */
-        }
-
-        /* --- THEME CHANGE: Electric Green Buttons --- */
-        .add-child-btn { 
-            background: #38B2AC; 
-            color: #1A202C; /* Dark text for contrast */
-            border: none; 
-            padding: 8px 16px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-size: 12px; 
-            font-weight: 700; /* Bolder text */
-            transition: background 0.3s ease; 
-        }
-        .add-child-btn:hover { background: #4FD1C5; } /* Lighter green on hover */
-
+        label { display: block; margin-bottom: 8px; color: #CBD5E0; font-weight: 600; font-size: 14px; }
+        input[type="text"], input[type="email"] { width: 100%; padding: 12px 15px; background-color: #1A202C; border: 2px solid #4A5568; color: #FFFFFF; border-radius: 8px; font-size: 14px; font-family: inherit; transition: all 0.3s ease; }
+        input[type="text"]:focus, input[type="email"]:focus { outline: none; border-color: #38B2AC; box-shadow: 0 0 0 3px rgba(56, 178, 172, 0.3); }
+        .children-section, .terms-section { background: #1A202C; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #4A5568; }
+        .children-section h3, .terms-section h4 { color: #FFFFFF; }
+        .terms-section { max-height: 200px; overflow-y: auto; } /* This ensures the scrollbar appears when needed */
+        .terms-content { font-size: 12px; line-height: 1.6; color: #A0AEC0; }
+        .terms-content h5 { color: #A0AEC0; font-size: 12px; margin-top: 12px; margin-bottom: 6px; font-weight: 600; }
+        .terms-content p { margin-bottom: 10px; }
+        .terms-content ul { margin-left: 20px; margin-bottom: 10px; }
+        .terms-content li { margin-bottom: 5px; }
+        .add-child-btn { background: #38B2AC; color: #1A202C; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700; transition: background 0.3s ease; }
+        .add-child-btn:hover { background: #4FD1C5; }
         .remove-child-btn { background: #E53E3E; color: white; border: none; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: background 0.3s ease; font-weight: 600; }
         .remove-child-btn:hover { background: #FC8181; }
-
-        /* --- THEME CHANGE: Electric Green Checkbox --- */
         .checkbox-group { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; }
-        .checkbox-group input[type="checkbox"] { 
-            width: 18px; 
-            height: 18px; 
-            margin-top: 2px; 
-            cursor: pointer; 
-            accent-color: #38B2AC; /* Your theme's electric green/teal */
-        }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; margin-top: 2px; cursor: pointer; accent-color: #38B2AC; }
         .checkbox-group label { margin: 0; font-weight: 400; font-size: 13px; line-height: 1.5; cursor: pointer; color: #CBD5E0; }
-
-        /* --- THEME CHANGE: Electric Green Submit Button --- */
-        .submit-btn { 
-            width: 100%; 
-            padding: 14px; 
-            background: #38B2AC; /* Your theme's electric green/teal */
-            color: #1A202C; /* Dark text for high contrast */
-            border: none; 
-            border-radius: 8px; 
-            font-size: 16px; 
-            font-weight: 700; 
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-        }
-        .submit-btn:hover { 
-            background: #4FD1C5; /* Lighter green on hover */
-            transform: translateY(-2px); 
-            box-shadow: 0 10px 25px rgba(56, 178, 172, 0.2); 
-        }
+        .submit-btn { width: 100%; padding: 14px; background: #38B2AC; color: #1A202C; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; }
+        .submit-btn:hover { background: #4FD1C5; transform: translateY(-2px); box-shadow: 0 10px 25px rgba(56, 178, 172, 0.2); }
         .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; background: #4A5568; }
-
-        /* --- Message Styles (No theme change needed, but good to check) --- */
         .success-message { display: none; background: #48BB78; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600; }
         .error-message { display: none; background: #E53E3E; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600; }
-        
-        .required { color: #38B2AC; } /* Using theme color for required asterisk */
+        .required { color: #38B2AC; }
         .loading { display: none; text-align: center; color: #FFFFFF; font-weight: 600; }
         .spinner { border: 3px solid #4A5568; border-top: 3px solid #38B2AC; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        @media (max-width: 768px) {
-            .container { margin: 20px auto; }
-            .form-section { padding: 30px 20px; }
-        }
+        @media (max-width: 768px) { .container { margin: 20px auto; } .form-section { padding: 30px 20px; } }
     </style>
 </head>
 <body>
-    <!-- The HTML structure below is unchanged -->
     <div class="container">
         <div class="content-wrapper">
             <div class="image-section">
@@ -188,14 +78,44 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- --- FULL TERMS & CONDITIONS RESTORED --- -->
                     <div class="terms-section">
                         <h4>📋 Terms & Conditions</h4>
                         <div class="terms-content">
-                            <h5>1. Free Trial & Subscription</h5><p>You will receive one (1) month of complimentary access...</p>
-                            <h5>2. Cancellation Policy</h5><p>You may cancel your subscription at any time...</p>
-                            <h5>4. Data Privacy & COPPA Compliance</h5><ul><li>We comply with the Children's Online Privacy Protection Act (COPPA)</li><li>We collect only necessary information...</li><li>Your data will never be sold to third parties</li></ul>
+                            <h5>1. Free Trial & Subscription</h5>
+                            <p>You will receive one (1) month of complimentary access to JULDD Media's Kids' AI Newsletter. After the trial period, standard subscription rates will apply. You will receive notification before any charges are made.</p>
+
+                            <h5>2. Cancellation Policy</h5>
+                            <p>You may cancel your subscription at any time, with no penalties or questions asked. Cancellation can be requested via email or through your account settings.</p>
+
+                            <h5>3. Content & Services</h5>
+                            <p>JULDD Media's Kids' AI Newsletter provides educational content featuring audio and animation designed for children. Content is age-appropriate and created with parental guidance in mind.</p>
+
+                            <h5>4. Data Privacy & COPPA Compliance</h5>
+                            <ul>
+                                <li>We comply with the Children's Online Privacy Protection Act (COPPA)</li>
+                                <li>We collect only necessary information: parent/guardian name, email, and children's names</li>
+                                <li>Your data will never be sold to third parties</li>
+                                <li>We use industry-standard encryption to protect your information</li>
+                                <li>You may request data deletion at any time</li>
+                            </ul>
+
+                            <h5>5. Email Communications</h5>
+                            <p>By signing up, you agree to receive newsletter content and occasional updates about JULDD Media services. You can unsubscribe at any time.</p>
+
+                            <h5>6. Parental Responsibility</h5>
+                            <p>Parents/guardians are responsible for monitoring their children's use of the newsletter content and ensuring it aligns with their family values.</p>
+
+                            <h5>7. Limitation of Liability</h5>
+                            <p>JULDD Media is provided "as is" without warranties. We are not liable for any indirect or consequential damages arising from use of our services.</p>
+
+                            <h5>8. Changes to Terms</h5>
+                            <p>We reserve the right to update these terms. Continued use of our services constitutes acceptance of updated terms.</p>
                         </div>
                     </div>
+                    <!-- --- END OF RESTORED CONTENT --- -->
+                    
                     <div class="checkbox-group">
                         <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
                         <label for="agreeTerms">I agree to the Terms & Conditions and understand that my child(ren) will receive age-appropriate educational content</label>
@@ -212,7 +132,7 @@
             </div>
         </div>
     </div>
-    <!-- The JavaScript below is unchanged -->
+    <!-- The JavaScript is unchanged -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script>
         const signupForm = document.getElementById('signupForm');
