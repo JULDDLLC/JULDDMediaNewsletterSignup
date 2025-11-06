@@ -1,59 +1,185 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const path = require('path');
-const { processFormSubmission } = require('./workflow'); // Correctly import your workflow
-
-const app = express();
-const port = process.env.PORT || 3000;
-
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// Serve static files from the root directory (for index.html, CSS, images)
-app.use(express.static(__dirname));
-
-// Root route to serve the main signup page
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// Favicon fallback routes
-app.get(['/favicon.ico', '/favicon.png'], (req, res) => {
-  const file = req.path.endsWith('.png') ? 'juldd_media_logo.png' : 'juldd_media_logo.ico';
-  res.sendFile(path.join(__dirname, file), (err) => {
-    if (err) {
-      res.status(404).send("Not found");
-    }
-  });
-});
-
-// Main newsletter signup handler
-// This single endpoint will now use the full workflow
-app.post('/api/signup', async (req, res) => {
-  console.log('Received signup request:', req.body);
-  try {
-    // Pass the entire form body to the processing function
-    const result = await processFormSubmission(req.body);
-    res.status(200).json({ success: true, message: result.message });
-  } catch (error) {
-    console.error('API Error:', error.message);
-    // Send a more descriptive error message to the frontend
-    res.status(500).json({ success: false, message: error.message || 'An internal server error occurred.' });
-  }
-});
-
-// Health check endpoint (optional but good practice)
-app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
-
-// Start the server if not running on a serverless environment like Vercel
-if (!process.env.VERCEL) {
-  app.listen(port, () => {
-    console.log(`🚀 Server running locally at http://localhost:${port}`);
-  });
-}
-
-// Export the app for serverless deployment
-module.exports = app;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JULDD Media - Kids' AI Newsletter Signup</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); min-height: 100vh; padding: 20px; color: #333; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); overflow: hidden; }
+        .content-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+        .image-section { background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); padding: 40px; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 600px; }
+        .image-section img { width: 100%; height: auto; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+        .form-section { padding: 50px 40px; display: flex; flex-direction: column; justify-content: center; }
+        .form-header { margin-bottom: 30px; }
+        .form-header h1 { color: #0f3460; font-size: 28px; margin-bottom: 10px; font-weight: 700; }
+        .form-header p { color: #666; font-size: 14px; line-height: 1.6; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #0f3460; font-weight: 600; font-size: 14px; }
+        input[type="text"], input[type="email"], textarea { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; font-family: inherit; transition: all 0.3s ease; }
+        input[type="text"]:focus, input[type="email"]:focus, textarea:focus { outline: none; border-color: #0f3460; box-shadow: 0 0 0 3px rgba(15, 52, 96, 0.1); }
+        .children-section { background: #f5f5f5; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .children-section h3 { color: #0f3460; font-size: 16px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .add-child-btn { background: #0f3460; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.3s ease; }
+        .add-child-btn:hover { background: #1a4d7a; }
+        .child-input-group { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-end; }
+        .child-input-group input { flex: 1; }
+        .remove-child-btn { background: #ff6b6b; color: white; border: none; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: background 0.3s ease; }
+        .remove-child-btn:hover { background: #ff5252; }
+        .terms-section { background: #f9f9f9; padding: 20px; border-radius: 10px; margin-bottom: 20px; max-height: 200px; overflow-y: auto; border: 1px solid #e0e0e0; }
+        .terms-section h4 { color: #0f3460; font-size: 14px; margin-bottom: 12px; font-weight: 700; }
+        .terms-content { font-size: 12px; line-height: 1.6; color: #555; }
+        .terms-content h5 { color: #0f3460; font-size: 12px; margin-top: 12px; margin-bottom: 6px; font-weight: 600; }
+        .checkbox-group { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; margin-top: 2px; cursor: pointer; accent-color: #0f3460; }
+        .checkbox-group label { margin: 0; font-weight: 400; font-size: 13px; line-height: 1.5; cursor: pointer; }
+        .submit-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(15, 52, 96, 0.3); }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+        .success-message { display: none; background: #4caf50; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600; }
+        .error-message { display: none; background: #ff6b6b; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600; }
+        .required { color: #ff6b6b; }
+        .loading { display: none; text-align: center; color: #0f3460; font-weight: 600; }
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #0f3460; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @media (max-width: 768px) {
+            .content-wrapper { grid-template-columns: 1fr; }
+            .image-section { min-height: 300px; }
+            .form-section { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content-wrapper">
+            <div class="image-section">
+                <img src="https://ldfacwgnawbpvufohzgm.supabase.co/storage/v1/object/public/image-uploads/loaded_images/join_the_waitlist_20251102_044756_29d9781f.png?" alt="JULDD Media Kids AI Newsletter">
+            </div>
+            <div class="form-section">
+                <div class="form-header">
+                    <h1>Join Our Newsletter</h1>
+                    <p>Get 1 month free access to JULDD Media's Kids' AI Newsletter featuring audio and animation content!</p>
+                </div>
+                <form id="signupForm" novalidate>
+                    <div class="success-message" id="successMessage">✓ Thank you! Check your email for a confirmation. Let's celebrate! 🎉</div>
+                    <div class="error-message" id="errorMessage"></div>
+                    <div class="form-group">
+                        <label for="parentName">Parent/Guardian Name <span class="required">*</span></label>
+                        <input type="text" id="parentName" name="parentName" required placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="parentEmail">Email Address <span class="required">*</span></label>
+                        <input type="email" id="parentEmail" name="parentEmail" required placeholder="your@email.com">
+                    </div>
+                    <div class="children-section">
+                        <h3>Children in Household <span class="required">*</span><button type="button" class="add-child-btn" onclick="addChildField()">+ Add Child</button></h3>
+                        <div id="childrenContainer">
+                            <div class="child-input-group">
+                                <input type="text" class="childName" placeholder="Child's name" required>
+                                <button type="button" class="remove-child-btn" onclick="removeChildField(this)" style="display: none;">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="terms-section">
+                        <h4>📋 Terms & Conditions</h4>
+                        <div class="terms-content">
+                            <h5>1. Free Trial & Subscription</h5><p>You will receive one (1) month of complimentary access to JULDD Media's Kids' AI Newsletter. After the trial period, standard subscription rates will apply. You will receive notification before any charges are made.</p>
+                            <h5>2. Cancellation Policy</h5><p>You may cancel your subscription at any time, with no penalties or questions asked.</p>
+                            <h5>4. Data Privacy & COPPA Compliance</h5><ul><li>We comply with the Children's Online Privacy Protection Act (COPPA)</li><li>We collect only necessary information: parent/guardian name, email, and children's names</li><li>Your data will never be sold to third parties</li></ul>
+                        </div>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                        <label for="agreeTerms">I agree to the Terms & Conditions and understand that my child(ren) will receive age-appropriate educational content</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="agreePrivacy" name="agreePrivacy" required>
+                        <label for="agreePrivacy">I consent to receive newsletter updates and agree to JULDD Media's privacy policy</label>
+                    </div>
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <span class="loading" id="loading"><span class="spinner"></span>Processing...</span>
+                        <span id="submitText">Get 1 Month Free Access</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <script>
+        const signupForm = document.getElementById('signupForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const submitText = document.getElementById('submitText');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const childrenContainer = document.getElementById('childrenContainer');
+        function addChildField() {
+            const newField = document.createElement('div');
+            newField.className = 'child-input-group';
+            newField.innerHTML = `<input type="text" class="childName" placeholder="Child's name" required><button type="button" class="remove-child-btn" onclick="removeChildField(this)">Remove</button>`;
+            childrenContainer.appendChild(newField);
+        }
+        function removeChildField(button) {
+            if (childrenContainer.children.length > 1) {
+                button.parentElement.remove();
+            } else {
+                showError('At least one child name is required.');
+            }
+        }
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+        function launchConfetti() {
+            const duration = 3 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+                const particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+        signupForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+            if (!document.getElementById('agreeTerms').checked || !document.getElementById('agreePrivacy').checked) {
+                showError('You must agree to the terms and privacy policy to continue.');
+                return;
+            }
+            const parentName = document.getElementById('parentName').value.trim();
+            const parentEmail = document.getElementById('parentEmail').value.trim();
+            const childrenNames = Array.from(document.querySelectorAll('.childName')).map(el => el.value.trim()).filter(name => name !== '').join(', ');
+            if (!parentName || !parentEmail || !childrenNames) {
+                showError('Please fill out all required fields (*).');
+                return;
+            }
+            loading.style.display = 'inline-block';
+            submitText.style.display = 'none';
+            submitBtn.disabled = true;
+            try {
+                const formData = { parentName, parentEmail, childrenNames };
+                const response = await fetch('/api/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) });
+                const result = await response.json();
+                if (!response.ok) { throw new Error(result.message || 'Submission failed. Please try again.'); }
+                successMessage.style.display = 'block';
+                launchConfetti();
+                signupForm.reset();
+                childrenContainer.innerHTML = `<div class="child-input-group"><input type="text" class="childName" placeholder="Child's name" required><button type="button" class="remove-child-btn" onclick="removeChildField(this)" style="display: none;">Remove</button></div>`;
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                loading.style.display = 'none';
+                submitText.style.display = 'inline';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
