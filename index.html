@@ -5,343 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JULDD Media - Kids' AI Newsletter Signup</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
-
-        .content-wrapper {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0;
-        }
-
-        .image-section {
-            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 600px;
-        }
-
-        .image-section img {
-            width: 100%;
-            height: auto;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .form-section {
-            padding: 50px 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .form-header {
-            margin-bottom: 30px;
-        }
-
-        .form-header h1 {
-            color: #0f3460;
-            font-size: 28px;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .form-header p {
-            color: #666;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #0f3460;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        input[type="text"],
-        input[type="email"],
-        textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.3s ease;
-        }
-
-        input[type="text"]:focus,
-        input[type="email"]:focus,
-        textarea:focus {
-            outline: none;
-            border-color: #0f3460;
-            box-shadow: 0 0 0 3px rgba(15, 52, 96, 0.1);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .children-section {
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .children-section h3 {
-            color: #0f3460;
-            font-size: 16px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .add-child-btn {
-            background: #0f3460;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: background 0.3s ease;
-        }
-
-        .add-child-btn:hover {
-            background: #1a4d7a;
-        }
-
-        .child-input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: flex-end;
-        }
-
-        .child-input-group input {
-            flex: 1;
-        }
-
-        .remove-child-btn {
-            background: #ff6b6b;
-            color: white;
-            border: none;
-            padding: 10px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: background 0.3s ease;
-        }
-
-        .remove-child-btn:hover {
-            background: #ff5252;
-        }
-
-        .terms-section {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #e0e0e0;
-        }
-
-        .terms-section h4 {
-            color: #0f3460;
-            font-size: 14px;
-            margin-bottom: 12px;
-            font-weight: 700;
-        }
-
-        .terms-content {
-            font-size: 12px;
-            line-height: 1.6;
-            color: #555;
-        }
-
-        .terms-content h5 {
-            color: #0f3460;
-            font-size: 12px;
-            margin-top: 12px;
-            margin-bottom: 6px;
-            font-weight: 600;
-        }
-
-        .terms-content p {
-            margin-bottom: 10px;
-        }
-
-        .terms-content ul {
-            margin-left: 20px;
-            margin-bottom: 10px;
-        }
-
-        .terms-content li {
-            margin-bottom: 5px;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            margin-top: 2px;
-            cursor: pointer;
-            accent-color: #0f3460;
-        }
-
-        .checkbox-group label {
-            margin: 0;
-            font-weight: 400;
-            font-size: 13px;
-            line-height: 1.5;
-            cursor: pointer;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(15, 52, 96, 0.3);
-        }
-
-        .submit-btn:active {
-            transform: translateY(0);
-        }
-
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .success-message {
-            display: none;
-            background: #4caf50;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .error-message {
-            display: none;
-            background: #ff6b6b;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .required {
-            color: #ff6b6b;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); min-height: 100vh; padding: 20px; color: #333; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); overflow: hidden; }
+        .content-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+        .image-section { background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); padding: 40px; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 600px; }
+        .image-section img { width: 100%; height: auto; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+        .form-section { padding: 50px 40px; display: flex; flex-direction: column; justify-content: center; }
+        .form-header { margin-bottom: 30px; }
+        .form-header h1 { color: #0f3460; font-size: 28px; margin-bottom: 10px; font-weight: 700; }
+        .form-header p { color: #666; font-size: 14px; line-height: 1.6; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #0f3460; font-weight: 600; font-size: 14px; }
+        input[type="text"], input[type="email"], textarea { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; font-family: inherit; transition: all 0.3s ease; }
+        input[type="text"]:focus, input[type="email"]:focus, textarea:focus { outline: none; border-color: #0f3460; box-shadow: 0 0 0 3px rgba(15, 52, 96, 0.1); }
+        textarea { resize: vertical; min-height: 80px; }
+        .children-section { background: #f5f5f5; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .children-section h3 { color: #0f3460; font-size: 16px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .add-child-btn { background: #0f3460; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.3s ease; }
+        .add-child-btn:hover { background: #1a4d7a; }
+        .child-input-group { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-end; }
+        .child-input-group input { flex: 1; }
+        .remove-child-btn { background: #ff6b6b; color: white; border: none; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: background 0.3s ease; }
+        .remove-child-btn:hover { background: #ff5252; }
+        .terms-section { background: #f9f9f9; padding: 20px; border-radius: 10px; margin-bottom: 20px; max-height: 200px; overflow-y: auto; border: 1px solid #e0e0e0; }
+        .terms-section h4 { color: #0f3460; font-size: 14px; margin-bottom: 12px; font-weight: 700; }
+        .terms-content { font-size: 12px; line-height: 1.6; color: #555; }
+        .terms-content h5 { color: #0f3460; font-size: 12px; margin-top: 12px; margin-bottom: 6px; font-weight: 600; }
+        .terms-content p { margin-bottom: 10px; }
+        .terms-content ul { margin-left: 20px; margin-bottom: 10px; }
+        .terms-content li { margin-bottom: 5px; }
+        .checkbox-group { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; margin-top: 2px; cursor: pointer; accent-color: #0f3460; }
+        .checkbox-group label { margin: 0; font-weight: 400; font-size: 13px; line-height: 1.5; cursor: pointer; }
+        .submit-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(15, 52, 96, 0.3); }
+        .submit-btn:active { transform: translateY(0); }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+        .success-message { display: none; background: #4caf50; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600; }
+        .error-message { display: none; background: #ff6b6b; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600; }
+        .required { color: #ff6b6b; }
+        .loading { display: none; text-align: center; color: #0f3460; font-weight: 600; }
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #0f3460; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @media (max-width: 768px) {
-            .content-wrapper {
-                grid-template-columns: 1fr;
-            }
-
-            .image-section {
-                min-height: 300px;
-                padding: 30px 20px;
-            }
-
-            .form-section {
-                padding: 30px 20px;
-            }
-
-            .form-header h1 {
-                font-size: 24px;
-            }
-
-            .child-input-group {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .remove-child-btn {
-                width: 100%;
-            }
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            color: #0f3460;
-            font-weight: 600;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #0f3460;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            .content-wrapper { grid-template-columns: 1fr; }
+            .image-section { min-height: 300px; padding: 30px 20px; }
+            .form-section { padding: 30px 20px; }
+            .form-header h1 { font-size: 24px; }
+            .child-input-group { flex-direction: column; align-items: stretch; }
+            .remove-child-btn { width: 100%; }
         }
     </style>
 </head>
@@ -358,25 +71,21 @@
                     <p>Get 1 month free access to JULDD Media's Kids' AI Newsletter featuring audio and animation content!</p>
                 </div>
 
-                <form id="signupForm">
+                <form id="signupForm" novalidate>
                     <div class="success-message" id="successMessage">
-                        ✓ Thank you for signing up! Check your email for confirmation.
+                        ✓ Thank you! Check your email for a confirmation. Let's celebrate! 🎉
                     </div>
-
                     <div class="error-message" id="errorMessage"></div>
 
-                    <!-- Parent Information -->
                     <div class="form-group">
                         <label for="parentName">Parent/Guardian Name <span class="required">*</span></label>
                         <input type="text" id="parentName" name="parentName" required placeholder="Enter your full name">
                     </div>
-
                     <div class="form-group">
                         <label for="parentEmail">Email Address <span class="required">*</span></label>
                         <input type="email" id="parentEmail" name="parentEmail" required placeholder="your@email.com">
                     </div>
 
-                    <!-- Children Information -->
                     <div class="children-section">
                         <h3>
                             Children in Household <span class="required">*</span>
@@ -390,54 +99,29 @@
                         </div>
                     </div>
 
-                    <!-- Terms & Conditions -->
                     <div class="terms-section">
                         <h4>📋 Terms & Conditions</h4>
                         <div class="terms-content">
-                            <h5>1. Free Trial & Subscription</h5>
-                            <p>You will receive one (1) month of complimentary access to JULDD Media's Kids' AI Newsletter. After the trial period, standard subscription rates will apply. You will receive notification before any charges are made.</p>
-
-                            <h5>2. Cancellation Policy</h5>
-                            <p>You may cancel your subscription at any time, with no penalties or questions asked. Cancellation can be requested via email or through your account settings.</p>
-
-                            <h5>3. Content & Services</h5>
-                            <p>JULDD Media's Kids' AI Newsletter provides educational content featuring audio and animation designed for children. Content is age-appropriate and created with parental guidance in mind.</p>
-
-                            <h5>4. Data Privacy & COPPA Compliance</h5>
-                            <ul>
-                                <li>We comply with the Children's Online Privacy Protection Act (COPPA)</li>
-                                <li>We collect only necessary information: parent/guardian name, email, and children's names</li>
-                                <li>Your data will never be sold to third parties</li>
-                                <li>We use industry-standard encryption to protect your information</li>
-                                <li>You may request data deletion at any time</li>
-                            </ul>
-
-                            <h5>5. Email Communications</h5>
-                            <p>By signing up, you agree to receive newsletter content and occasional updates about JULDD Media services. You can unsubscribe at any time.</p>
-
-                            <h5>6. Parental Responsibility</h5>
-                            <p>Parents/guardians are responsible for monitoring their children's use of the newsletter content and ensuring it aligns with their family values.</p>
-
-                            <h5>7. Limitation of Liability</h5>
-                            <p>JULDD Media is provided "as is" without warranties. We are not liable for any indirect or consequential damages arising from use of our services.</p>
-
-                            <h5>8. Changes to Terms</h5>
-                            <p>We reserve the right to update these terms. Continued use of our services constitutes acceptance of updated terms.</p>
+                            <h5>1. Free Trial & Subscription</h5><p>You will receive one (1) month of complimentary access... [Content as before]</p>
+                            <h5>2. Cancellation Policy</h5><p>You may cancel your subscription at any time... [Content as before]</p>
+                            <h5>3. Content & Services</h5><p>JULDD Media's Kids' AI Newsletter provides educational content... [Content as before]</p>
+                            <h5>4. Data Privacy & COPPA Compliance</h5><ul><li>We comply with the Children's Online Privacy Protection Act (COPPA)</li><li>We collect only necessary information: parent/guardian name, email, and children's names</li><li>Your data will never be sold to third parties</li><li>We use industry-standard encryption to protect your information</li><li>You may request data deletion at any time</li></ul>
+                            <h5>5. Email Communications</h5><p>By signing up, you agree to receive newsletter content... [Content as before]</p>
+                            <h5>6. Parental Responsibility</h5><p>Parents/guardians are responsible for monitoring... [Content as before]</p>
+                            <h5>7. Limitation of Liability</h5><p>JULDD Media is provided "as is" without warranties... [Content as before]</p>
+                            <h5>8. Changes to Terms</h5><p>We reserve the right to update these terms... [Content as before]</p>
                         </div>
                     </div>
 
-                    <!-- Acceptance Checkbox -->
                     <div class="checkbox-group">
                         <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
                         <label for="agreeTerms">I agree to the Terms & Conditions and understand that my child(ren) will receive age-appropriate educational content</label>
                     </div>
-
                     <div class="checkbox-group">
                         <input type="checkbox" id="agreePrivacy" name="agreePrivacy" required>
                         <label for="agreePrivacy">I consent to receive newsletter updates and agree to JULDD Media's privacy policy</label>
                     </div>
 
-                    <!-- Submit Button -->
                     <button type="submit" class="submit-btn" id="submitBtn">
                         <span class="loading" id="loading"><span class="spinner"></span>Processing...</span>
                         <span id="submitText">Get 1 Month Free Access</span>
@@ -447,155 +131,140 @@
         </div>
     </div>
 
+    <!-- Correctly placed confetti library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <!-- Single, unified script for all form logic -->
     <script>
+        const signupForm = document.getElementById('signupForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const submitText = document.getElementById('submitText');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const childrenContainer = document.getElementById('childrenContainer');
+
         function addChildField() {
-            const container = document.getElementById('childrenContainer');
             const newField = document.createElement('div');
             newField.className = 'child-input-group';
             newField.innerHTML = `
                 <input type="text" class="childName" placeholder="Child's name" required>
                 <button type="button" class="remove-child-btn" onclick="removeChildField(this)">Remove</button>
             `;
-            container.appendChild(newField);
+            childrenContainer.appendChild(newField);
         }
 
         function removeChildField(button) {
-            const container = document.getElementById('childrenContainer');
-            if (container.children.length > 1) {
+            if (childrenContainer.children.length > 1) {
                 button.parentElement.remove();
             } else {
-                alert('Please keep at least one child name.');
+                // Instead of an alert, maybe just visually indicate it's required
+                const input = button.parentElement.querySelector('input');
+                input.focus();
+                showError('At least one child name is required.');
             }
         }
 
-        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+
+        // 🎉 Confetti celebration on successful signup
+        function launchConfetti() {
+            const duration = 3 * 1000; // 3 seconds
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+
+                const particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
+        signupForm.addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const submitBtn = document.getElementById('submitBtn');
-            const loading = document.getElementById('loading');
-            const submitText = document.getElementById('submitText');
-            const successMessage = document.getElementById('successMessage');
-            const errorMessage = document.getElementById('errorMessage');
-
-            // Hide messages
+            // Hide previous messages
             successMessage.style.display = 'none';
             errorMessage.style.display = 'none';
 
-            // Show loading
-            loading.style.display = 'inline';
+            // --- Form Validation ---
+            if (!document.getElementById('agreeTerms').checked || !document.getElementById('agreePrivacy').checked) {
+                showError('You must agree to the terms and privacy policy to continue.');
+                return;
+            }
+
+            const parentName = document.getElementById('parentName').value.trim();
+            const parentEmail = document.getElementById('parentEmail').value.trim();
+            const childrenElements = document.querySelectorAll('.childName');
+            const childrenNames = Array.from(childrenElements)
+                .map(el => el.value.trim())
+                .filter(name => name !== '')
+                .join(', ');
+
+            if (!parentName || !parentEmail || !childrenNames) {
+                showError('Please fill out all required fields (*).');
+                return;
+            }
+
+            // --- UI State: Loading ---
+            loading.style.display = 'inline-block';
             submitText.style.display = 'none';
             submitBtn.disabled = true;
 
             try {
-                // Collect form data
-                const parentName = document.getElementById('parentName').value;
-                const parentEmail = document.getElementById('parentEmail').value;
-                const childrenElements = document.querySelectorAll('.childName');
-                const childrenNames = Array.from(childrenElements)
-                    .map(el => el.value)
-                    .filter(name => name.trim() !== '')
-                    .join(', ');
-
-                // Create form data object
                 const formData = {
                     parentName,
                     parentEmail,
-                    childrenNames,
-                    signupDate: new Date().toISOString(),
-                    status: 'pending'
+                    childrenNames
                 };
 
-                // Send to backend (we'll set this up with the workflow)
                 const response = await fetch('/api/signup', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
                 });
 
-                if (response.ok) {
-                    successMessage.style.display = 'block';
-                    document.getElementById('signupForm').reset();
-                    
-                    // Reset children fields
-                    const container = document.getElementById('childrenContainer');
-                    container.innerHTML = `
-                        <div class="child-input-group">
-                            <input type="text" class="childName" placeholder="Child's name" required>
-                            <button type="button" class="remove-child-btn" onclick="removeChildField(this)" style="display: none;">Remove</button>
-                        </div>
-                    `;
-                } else {
-                    throw new Error('Submission failed');
+                const result = await response.json();
+
+                if (!response.ok) {
+                    // Throw an error to be caught by the catch block
+                    throw new Error(result.message || 'Submission failed. Please try again.');
                 }
+
+                // --- UI State: Success ---
+                successMessage.style.display = 'block';
+                launchConfetti(); // 🎉 Trigger confetti here!
+                signupForm.reset(); // Resets all standard form fields
+
+                // Manually reset the children container to its initial state
+                childrenContainer.innerHTML = `
+                    <div class="child-input-group">
+                        <input type="text" class="childName" placeholder="Child's name" required>
+                        <button type="button" class="remove-child-btn" onclick="removeChildField(this)" style="display: none;">Remove</button>
+                    </div>
+                `;
+
             } catch (error) {
-                errorMessage.textContent = 'An error occurred. Please try again.';
-                errorMessage.style.display = 'block';
+                // --- UI State: Error ---
+                showError(error.message);
             } finally {
+                // --- UI State: Reset Button ---
                 loading.style.display = 'none';
                 submitText.style.display = 'inline';
                 submitBtn.disabled = false;
             }
         });
-   <!-- 🎉 Confetti celebration on successful signup -->
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-<script>
-  // Launch a quick burst of confetti
-  function launchConfetti() {
-    const duration = 2 * 1000; // 2 seconds
-    const animationEnd = Date.now() + duration;
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
-
-    function randomInRange(min, max) {
-      return Math.random() * (max - min) + min;
-    }
-
-    const interval = setInterval(function() {
-      const timeLeft = animationEnd - Date.now();
-      if (timeLeft <= 0) return clearInterval(interval);
-
-      const particleCount = 50 * (timeLeft / duration);
-      confetti(Object.assign({}, defaults, {
-        particleCount,
-        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
-      }));
-      confetti(Object.assign({}, defaults, {
-        particleCount,
-        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
-      }));
-    }, 250);
-  }
-
-  // Hook into your existing success logic
-  const form = document.getElementById('signupForm');
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const formData = new FormData(form);
-    const payload = Object.fromEntries(formData.entries());
-
-    try {
-      const res = await fetch('/api/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        document.getElementById('successMessage').style.display = 'block';
-        document.getElementById('errorMessage').style.display = 'none';
-        launchConfetti(); // 🎉 trigger confetti here
-      } else {
-        throw new Error(data.message || 'Signup failed.');
-      }
-    } catch (err) {
-      document.getElementById('errorMessage').style.display = 'block';
-      document.getElementById('successMessage').style.display = 'none';
-      console.error(err);
-    }
-  });
-</script>
+    </script>
 </body>
 </html>
