@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
-const workflows = require('./workflows');
+const { processFormSubmission } = require('./workflow'); // This will now find the correct file!
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -11,8 +11,6 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-// Serve static files from the root directory (for index.html, CSS, images)
 app.use(express.static(__dirname));
 
 // Root route to serve the main signup page
@@ -30,75 +28,27 @@ app.get(['/favicon.ico', '/favicon.png'], (req, res) => {
   });
 });
 
-// Endpoint to get signups since a specific time (for daily reports)
-app.get('/api/signups/since/:timestamp', (req, res) => {
-    const timestamp = parseInt(req.params.timestamp);
-    const recentSignups = signups.filter(signup => {
-        const signupTime = new Date(signup.date).getTime();
-        return signupTime >= timestamp;
-    });
-
-    res.json({
-        total: recentSignups.length,
-        signups: recentSignups
-    });
+// Main newsletter signup handler
+app.post('/api/signup', async (req, res) => {
+  console.log('Received signup request:', req.body);
+  try {
+    const result = await processFormSubmission(req.body);
+    res.status(200).json({ success: true, message: result.message });
+  } catch (error) {
+    console.error('API Error:', error.message);
+    res.status(500).json({ success: false, message: error.message || 'An internal server error occurred.' });
+  }
 });
 
-// Endpoint to send test report
-app.post('/api/test-report', async (req, res) => {
-    try {
-        console.log('📧 Sending test report...');
-        const result = await workflows.sendTestReport();
-        res.json({
-            success: true,
-            message: 'Test report sent to julie@juldd.com',
-            result
-        });
-    } catch (error) {
-        console.error('Error sending test report:', error);
-        res.status(500).json({ error: 'Failed to send test report' });
-    }
-});
-
-// Endpoint to trigger morning report
-app.post('/api/reports/morning', async (req, res) => {
-    try {
-        const result = await workflows.generateMorningReport();
-        res.json({
-            success: true,
-            message: 'Morning report generated',
-            result
-        });
-    } catch (error) {
-        console.error('Error generating morning report:', error);
-        res.status(500).json({ error: 'Failed to generate morning report' });
-    }
-});
-
-// Endpoint to trigger evening report
-app.post('/api/reports/evening', async (req, res) => {
-    try {
-        const result = await workflows.generateEveningReport();
-        res.json({
-            success: true,
-            message: 'Evening report generated',
-            result
-        });
-    } catch (error) {
-        console.error('Error generating evening report:', error);
-        res.status(500).json({ error: 'Failed to generate evening report' });
-    }
-});
-
-// Health check endpoint (optional but good practice)
+// Health check endpoint
 app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
 
-// Start the server if not running on a serverless environment like Vercel
+// Start the server if not running on Vercel
 if (!process.env.VERCEL) {
   app.listen(port, () => {
     console.log(`🚀 Server running locally at http://localhost:${port}`);
   });
 }
 
-// Export the app for serverless deployment
+// Export the app for Vercel
 module.exports = app;
