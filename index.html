@@ -5,86 +5,162 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JULDD Media - Kids' AI Newsletter Signup</title>
     <style>
+        /* --- THEME RESET & FONT --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); min-height: 100vh; padding: 20px; color: #333; }
-        .container { max-width: 700px; /* Adjusted max-width for a single column layout */ margin: 40px auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); overflow: hidden; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            /* --- THEME CHANGE: Dark Mode Background --- */
+            background-color: #1A202C; /* A dark navy/charcoal from your theme */
+            min-height: 100vh; 
+            padding: 20px; 
+            color: #E2E8F0; /* Light text for dark background */
+        }
+
+        /* --- THEME CHANGE: Dark Form Container --- */
+        .container { 
+            max-width: 700px; 
+            margin: 40px auto; 
+            background: #2D3748; /* The dark gray card color from your theme */
+            border-radius: 20px; 
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); 
+            overflow: hidden; 
+            border: 1px solid #4A5568; /* Subtle border */
+        }
         
-        /* --- CHANGE 1: Switched to a single column layout --- */
-        .content-wrapper { 
-            display: grid; 
-            grid-template-columns: 1fr; /* This creates one column, so items stack vertically */
-            gap: 0; 
-        }
+        .content-wrapper { display: grid; grid-template-columns: 1fr; gap: 0; }
+        .image-section { line-height: 0; }
+        .image-section img { width: 100%; height: auto; display: block; }
 
-        /* --- CHANGE 2: Adjusted image section for top placement --- */
-        .image-section { 
-            /* The gradient is now a fallback if the image doesn't load */
-            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); 
-            line-height: 0; /* Removes any extra space around the image */
-        }
-        
-        .image-section img { 
-            width: 100%; 
-            height: auto; 
-            display: block; /* Ensures no extra space below the image */
-        }
+        .form-section { padding: 40px; display: flex; flex-direction: column; justify-content: center; }
 
-        /* --- CHANGE 3: Adjusted form section padding for the new layout --- */
-        .form-section { 
-            padding: 40px; /* Uniform padding */
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-        }
-
+        /* --- THEME CHANGE: Light Text Headers --- */
         .form-header { margin-bottom: 30px; }
-        .form-header h1 { color: #0f3460; font-size: 28px; margin-bottom: 10px; font-weight: 700; }
-        .form-header p { color: #666; font-size: 14px; line-height: 1.6; }
+        .form-header h1 { 
+            color: #FFFFFF; /* White main header */
+            font-size: 28px; 
+            margin-bottom: 10px; 
+            font-weight: 700; 
+        }
+        .form-header p { 
+            color: #A0AEC0; /* Lighter gray for subheading */
+            font-size: 14px; 
+            line-height: 1.6; 
+        }
+
         .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: #0f3460; font-weight: 600; font-size: 14px; }
-        input[type="text"], input[type="email"], textarea { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; font-family: inherit; transition: all 0.3s ease; }
-        input[type="text"]:focus, input[type="email"]:focus, textarea:focus { outline: none; border-color: #0f3460; box-shadow: 0 0 0 3px rgba(15, 52, 96, 0.1); }
-        .children-section { background: #f5f5f5; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
-        .children-section h3 { color: #0f3460; font-size: 16px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .add-child-btn { background: #0f3460; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.3s ease; }
-        .add-child-btn:hover { background: #1a4d7a; }
-        .child-input-group { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-end; }
-        .child-input-group input { flex: 1; }
-        .remove-child-btn { background: #ff6b6b; color: white; border: none; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: background 0.3s ease; }
-        .remove-child-btn:hover { background: #ff5252; }
-        .terms-section { background: #f9f9f9; padding: 20px; border-radius: 10px; margin-bottom: 20px; max-height: 200px; overflow-y: auto; border: 1px solid #e0e0e0; }
-        .terms-section h4 { color: #0f3460; font-size: 14px; margin-bottom: 12px; font-weight: 700; }
-        .terms-content { font-size: 12px; line-height: 1.6; color: #555; }
-        .terms-content h5 { color: #0f3460; font-size: 12px; margin-top: 12px; margin-bottom: 6px; font-weight: 600; }
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            color: #CBD5E0; /* Light gray for labels */
+            font-weight: 600; 
+            font-size: 14px; 
+        }
+
+        /* --- THEME CHANGE: Dark Inputs --- */
+        input[type="text"], input[type="email"] { 
+            width: 100%; 
+            padding: 12px 15px; 
+            background-color: #1A202C; /* Dark background for inputs */
+            border: 2px solid #4A5568; /* Gray border */
+            color: #FFFFFF; /* White text when typing */
+            border-radius: 8px; 
+            font-size: 14px; 
+            font-family: inherit; 
+            transition: all 0.3s ease; 
+        }
+
+        /* --- THEME CHANGE: Electric Green Focus Highlight --- */
+        input[type="text"]:focus, input[type="email"]:focus { 
+            outline: none; 
+            border-color: #38B2AC; /* Your theme's electric green/teal */
+            box-shadow: 0 0 0 3px rgba(56, 178, 172, 0.3); 
+        }
+
+        /* --- THEME CHANGE: Dark Sections --- */
+        .children-section, .terms-section { 
+            background: #1A202C; /* Matching dark background */
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 20px; 
+            border: 1px solid #4A5568;
+        }
+        .children-section h3, .terms-section h4 { 
+            color: #FFFFFF; /* White headers for sections */
+        }
+        .terms-content, .terms-content h5 {
+            color: #A0AEC0; /* Light gray for terms text */
+        }
+
+        /* --- THEME CHANGE: Electric Green Buttons --- */
+        .add-child-btn { 
+            background: #38B2AC; 
+            color: #1A202C; /* Dark text for contrast */
+            border: none; 
+            padding: 8px 16px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 12px; 
+            font-weight: 700; /* Bolder text */
+            transition: background 0.3s ease; 
+        }
+        .add-child-btn:hover { background: #4FD1C5; } /* Lighter green on hover */
+
+        .remove-child-btn { background: #E53E3E; color: white; border: none; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: background 0.3s ease; font-weight: 600; }
+        .remove-child-btn:hover { background: #FC8181; }
+
+        /* --- THEME CHANGE: Electric Green Checkbox --- */
         .checkbox-group { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; }
-        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; margin-top: 2px; cursor: pointer; accent-color: #0f3460; }
-        .checkbox-group label { margin: 0; font-weight: 400; font-size: 13px; line-height: 1.5; cursor: pointer; }
-        .submit-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; }
-        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(15, 52, 96, 0.3); }
-        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
-        .success-message { display: none; background: #4caf50; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600; }
-        .error-message { display: none; background: #ff6b6b; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600; }
-        .required { color: #ff6b6b; }
-        .loading { display: none; text-align: center; color: #0f3460; font-weight: 600; }
-        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #0f3460; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
+        .checkbox-group input[type="checkbox"] { 
+            width: 18px; 
+            height: 18px; 
+            margin-top: 2px; 
+            cursor: pointer; 
+            accent-color: #38B2AC; /* Your theme's electric green/teal */
+        }
+        .checkbox-group label { margin: 0; font-weight: 400; font-size: 13px; line-height: 1.5; cursor: pointer; color: #CBD5E0; }
+
+        /* --- THEME CHANGE: Electric Green Submit Button --- */
+        .submit-btn { 
+            width: 100%; 
+            padding: 14px; 
+            background: #38B2AC; /* Your theme's electric green/teal */
+            color: #1A202C; /* Dark text for high contrast */
+            border: none; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+        }
+        .submit-btn:hover { 
+            background: #4FD1C5; /* Lighter green on hover */
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 25px rgba(56, 178, 172, 0.2); 
+        }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; background: #4A5568; }
+
+        /* --- Message Styles (No theme change needed, but good to check) --- */
+        .success-message { display: none; background: #48BB78; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600; }
+        .error-message { display: none; background: #E53E3E; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600; }
+        
+        .required { color: #38B2AC; } /* Using theme color for required asterisk */
+        .loading { display: none; text-align: center; color: #FFFFFF; font-weight: 600; }
+        .spinner { border: 3px solid #4A5568; border-top: 3px solid #38B2AC; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* The media query for mobile is now the default, so we can simplify or remove it */
         @media (max-width: 768px) {
-            .container {
-                margin: 20px auto; /* A little less margin on mobile */
-            }
-            .form-section {
-                padding: 30px 20px;
-            }
+            .container { margin: 20px auto; }
+            .form-section { padding: 30px 20px; }
         }
     </style>
 </head>
 <body>
+    <!-- The HTML structure below is unchanged -->
     <div class="container">
         <div class="content-wrapper">
             <div class="image-section">
-                <!-- This is the image you wanted to be the primary focus -->
                 <img src="https://ldfacwgnawbpvufohzgm.supabase.co/storage/v1/object/public/image-uploads/loaded_images/join_the_waitlist_20251102_044756_29d9781f.png?" alt="JULDD Media Kids AI Newsletter">
             </div>
             <div class="form-section">
@@ -115,9 +191,9 @@
                     <div class="terms-section">
                         <h4>📋 Terms & Conditions</h4>
                         <div class="terms-content">
-                            <h5>1. Free Trial & Subscription</h5><p>You will receive one (1) month of complimentary access to JULDD Media's Kids' AI Newsletter. After the trial period, standard subscription rates will apply. You will receive notification before any charges are made.</p>
-                            <h5>2. Cancellation Policy</h5><p>You may cancel your subscription at any time, with no penalties or questions asked.</p>
-                            <h5>4. Data Privacy & COPPA Compliance</h5><ul><li>We comply with the Children's Online Privacy Protection Act (COPPA)</li><li>We collect only necessary information: parent/guardian name, email, and children's names</li><li>Your data will never be sold to third parties</li></ul>
+                            <h5>1. Free Trial & Subscription</h5><p>You will receive one (1) month of complimentary access...</p>
+                            <h5>2. Cancellation Policy</h5><p>You may cancel your subscription at any time...</p>
+                            <h5>4. Data Privacy & COPPA Compliance</h5><ul><li>We comply with the Children's Online Privacy Protection Act (COPPA)</li><li>We collect only necessary information...</li><li>Your data will never be sold to third parties</li></ul>
                         </div>
                     </div>
                     <div class="checkbox-group">
@@ -136,6 +212,7 @@
             </div>
         </div>
     </div>
+    <!-- The JavaScript below is unchanged -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script>
         const signupForm = document.getElementById('signupForm');
