@@ -12,7 +12,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Serve static files from the root directory (for index.html, CSS, images)
+// Serve static files from the root directory
 app.use(express.static(__dirname));
 
 // Root route to serve the main signup page
@@ -42,10 +42,10 @@ app.post('/api/signup', async (req, res) => {
   }
 });
 
-// Health check endpoint (optional but good practice)
+// Health check endpoint
 app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
 
-// Start the server if not running on a serverless environment like Vercel
+// Start the server if not running on Vercel
 if (!process.env.VERCEL) {
   app.listen(port, () => {
     console.log(`🚀 Server running locally at http://localhost:${port}`);
